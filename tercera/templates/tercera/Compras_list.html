@@ -1,0 +1,29 @@
+{% extends 'tercera/base.html' %}
+
+{% block tittle %} Compras {% endblock %}
+
+{% block titulo %}
+    Listado de Compras
+{% endblock %}
+
+{%block listado%}
+
+<form>
+
+    <p>
+        <label for="criterio_compra">Criterio:</label>
+        <input type="text" name="compra" maxlength="100" required="" id="criterio_compra">
+    </p>
+
+    <p>
+        <input type="submit" value="Buscar">
+    </p>
+
+</form>
+
+<ul>
+    {% for compra in compras %}
+        <li>{{compra}}</li>
+    {% endfor %}
+</ul>
+{% endblock %}

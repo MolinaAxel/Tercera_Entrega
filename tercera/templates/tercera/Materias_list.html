@@ -1,0 +1,28 @@
+{% extends 'tercera/base.html' %}
+
+{% block tittle %} Materias {% endblock %}
+
+{% block titulo %}
+    Listado de Materias
+{% endblock %}
+
+{%block listado%}
+
+<form>
+
+    <p>
+        <label for="criterio_materia">Criterio:</label>
+        <input type="text" name="materia" maxlength="100" required="" id="criterio_materia">
+    </p>
+
+    <p>
+        <input type="submit" value="Buscar">
+    </p>
+
+</form>
+
+    {% for materia in materias %}
+        <li>{{materia}}</li>
+    {% endfor %}
+
+{% endblock %}

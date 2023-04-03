@@ -1,0 +1,20 @@
+{% extends 'tercera/base.html' %}
+
+{% block tittle %} Materias {% endblock %}
+
+{% block titulo %}
+    Listado de Materias
+{% endblock %}
+
+{%block listado%}
+    <form action="{% url 'materias-create' %}" method="POST">}
+        {% csrf_token %}
+        {{form.as_p}}
+        <input type="submit" value="Guardar">
+    </form>
+
+    {% for materia in materias %}
+        <li>{{materia}}</li>
+    {% endfor %}
+
+{% endblock %}

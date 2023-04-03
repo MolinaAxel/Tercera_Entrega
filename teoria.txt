@@ -1,0 +1,177 @@
+para empezar el projecto es con python -m django startproject "nombre"
+python -m django startapp "nombre" para crear el nombre de la aplicacion
+ir a la configuracion y la parte de installed app, instalar la aplicacion creada anterior
+
+en la parte de view creamos nuestros procedimientos a mostrar
+y leugo hay que vincularlos en la seccion de urls
+tambien hay que importar las views a las urls 
+
+from "ubicacion" import "nombre del procedimiento"
+
+Panel de administracion: viene integrado 
+
+
+
+si salta error "TemplateddoesnotExist"  es que falta registrar la aplicacion
+en settings
+
+crear los modelos para lo que queremos hacer y mostrar 
+
+class Post(models.Model):
+    carousel_caption_title = models.CharField(max_length=30)
+    carousel_caption_description = models.CharField(max_length=80)
+    heading = models.CharField(max_length=15)
+    description = models.CharField(max_length=120)
+
+    def __str__(self):
+        return f"ñ{self.id} - {self.heading}"
+
+este es un ejemplo de model, donde el str muestra lo que va a imprimir
+y lo de arriba son las variables y las cantidad de caracteres que se pueden
+almacenar en esas variables
+
+despues hay que hacer un registro y esto se hace desde el admin.py
+una vez registrado el admin, hay que crear un usuario se hacer desde el shell
+
+ERROR no such table: SocialTravel_post este error se debe a que se abrio un nuevo modelo
+, cuando se hace un nuevo modelo hay que hacer la migracion
+
+python manage.py makemigrations crear las migraciones
+python manage.py migrate va a migrar los nuevos modelos
+
+
+crear un modelo 
+
+class Persona(models.Model):
+	nombre = models.Textfield(max_lenght=100)
+
+Formularios: se crea un archivo html para crear el formulario
+dentro del html crearemos el tag <form> lo qeu pongamos adentro de ese tag
+va a ser un formulario
+
+<form action="persona" method="POST"> el action sirve para vincular
+el formulario con la url que vamos a utilizar, estas url se encuentran
+en urls.py, solo hay que copiar la misma direccion y method es el metod oque vamos a usar
+
+<p> para crear parrafos
+
+<p> Curso: <input type="text" name="curso"></p>
+
+el input es para qeu cuando ingresemos enter se pose sobre el que sigue
+el type="" es el tipo de strings que se van a permitir dentro de ese formulario
+en este caos de tipo texto, se puede poner number para que solo
+sean numero y asi
+y luego name="" es el nombre del campo
+
+<input type="submit" value="Enviar"> el submit es un boton para precionar
+y subir el formulario, y el value="" es el nombre que va a tener ese boton
+
+</form> esto para terminar el formulario
+
+
+creacion de formularios (API form django)
+
+se crea un archivo, forms.py en el mismo nivel de models, apps y eso
+y luego importamos el modulo forms
+
+from django import forms
+
+crear una class y definir que campos va a tener el formulario, hay que fijarnos
+en el modelo de la clase formulario que variables tiene e imitarlas
+
+luego iremos al view y vamos a copiar el modelo donde vamos a mostrar la clase
+y le agregamos el formulario y agregar otra funcion para poder atender
+al formulario
+
+primero vamos a importar el modelo nuevo a views
+
+esto lo vamos a hacer desde el return render, donde usamos el {"persona":persona}
+vamos a pasarlo a una variable context y ahi vamos  agregar el {"form":form}
+
+
+ context = {"personas": personas, 
+     "total_personas":total_personas,
+     "form":PersonaForm(),
+     }
+    return render(request, "hola_mundo/personas.html",context)
+
+un ejemplo de como qeudaria la funcion
+
+despes hay que ir a la persona.html o la clase que estemos usando, en el templates
+y dentro del <block listado> vamos a agregar el formulario
+
+<form action="{% url 'persona-create' %}"> (de esta maenra se accede a la url)
+    {{form.as_p}}
+    <input type="submit" value="agregar">
+
+</form>
+
+para crear una persona vamos a crear otra funcion en views
+
+cargar_persona(request):
+	f = PersonaForm(request.POST) (f es por convencion) y le pasamos un post
+que es para decir que vamos a crear una persona
+
+le vamos a pasar el mismo contexto qeu tenia la funcion mostrar_persona pero sin
+el "form":PersonaForm()
+
+primero preguntaremos si es valido el formularo
+
+if f.is_valid(): esto quiere decir que el usuario paso texto y fecha en sus campos correspondiuentes
+
+primero vamos a guardar la persona
+
+Persona( f.data["nombre"], f.data["apellido"], f.["fecha_nacimiento"]).save
+de esta manera vamos a guardar la persona ingresada
+y retornamos return render(request, "hola_mundo/personas.html",
+    context)
+
+despues hay que crear la urls 'personas/create', crear_persona, name="persona-create"
+
+al agregar nos va a tirar error "Prhoibido, vrificacion csrf fallida"
+
+csrf es uan firma digital, el csrf solo funcioan con el POST
+
+asi que para poder validar esa firma digital hay que ir a personas.html en la parte
+de formularios
+e inyectas {% csrf_token %}
+
+
+(al no guardarse lo mas probable es que fuese por el formate de la fecha)
+
+una manera de corregir (por el profe)
+
+import pdb; pdb.set_trace() esto es punto de debug, para poder inspeccionar el cdoigo
+
+si ponemos l en la terminal nos va a mostrar donde esta parado el debug
+
+
+si ponemos n de next va a saltar una linea de codigo, si usamos l devuelta veremos que avanzo
+una linea
+
+otra n va a salir un error o lo que salta, podemos usar la c podemos continuar la ejecucion
+
+
+
+RESULTADO FINAL DE COMO QUEDARIA AL MODELO CREAR PERSONAS
+def crear_persona(request):
+
+    f = PersonaForm(request.POST)
+    context = {
+        "form":f,
+    }
+
+
+    if f.is_valid():
+        Persona( nombre=f.data["nombre"], apellido=f.data["apellido"],fecha_nacimiento=f.data["fecha_nacimiento"]).save() 
+        context['form'] = PersonaForm()
+
+
+    context["personas"] = Persona.objects.all()
+    context["total_personas"] = len(Persona.objects.all())
+
+    return render(request, "hola_mundo/personas.html",
+    context)
+
+
+
